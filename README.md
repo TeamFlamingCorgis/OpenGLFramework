@@ -1,5 +1,5 @@
 ## OpenGLFramework
-## Oh
+### Teamwork by Rosemary Adejoh & Liselot Ramirez
 is a small cross-platform framework for learning OpenGL programming
 
 [Installation](https://github.com/wobakj/OpenGLFramework/wiki/Installation)
