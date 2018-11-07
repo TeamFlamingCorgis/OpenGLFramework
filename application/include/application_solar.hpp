@@ -4,6 +4,7 @@
 #include "application.hpp"
 #include "model.hpp"
 #include "structs.hpp"
+#include "planet.h" //ASSIGNMENT 1
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -24,6 +25,17 @@ class ApplicationSolar : public Application {
 
   // draw all objects
   void render() const;
+    //Render planets
+    void renderPlanets(Planet thePlanet) const;
+    //Assignment 2 - Make stars and orbits
+    void makeStars();
+    void renderStars() const;
+    void makeOrbits(Planet aPlanet);
+    void renderOrbits() const;
+
+    //Assignment 2 - buffers for star and orbit
+    std::vector<float> orbitBuffer;
+    std::vector<float> starBuffer;
 
  protected:
   void initializeShaderPrograms();
@@ -32,6 +44,10 @@ class ApplicationSolar : public Application {
 
   // cpu representation of model
   model_object planet_object;
+
+  //Assignment 2 - Star model and orbit model
+  model_object star_object;
+  model_object orbit_object;
 };
 
 #endif

@@ -6,7 +6,7 @@
 #include "model_loader.hpp"
 
 #include <glbinding/gl/gl.h>
-// use gl definitions from glbinding 
+// use gl definitions from glbinding
 using namespace gl;
 
 //dont load gl bindings from glfw
@@ -19,34 +19,272 @@ using namespace gl;
 
 #include <iostream>
 
+//Define planets and moon
+#define  NUMBER_OF_CEL_BODIES 9
+#define  NUMBER_OF_STARS 1000
+#define  ORBIT_THICKNESS 500
+#define  DEFAULT_SIZE 0.4 //Default sun size
+//Declare defaults for the min distance from the sun, the default for rotation, orbit, and speed time
+#define  DEFAULT_DIST 0.4 * 20.0
+#define  DEFAULT_ROTATION 0.5
+
+//Initialize the models here, because otherwise it won't compile
+model planet_model{};
+model star_model{};
+model orbit_model{};
+
+Planet sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
+//gather all the planets in an array
+Planet arrayOfPlanets[NUMBER_OF_CEL_BODIES] = { sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune };
+
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
- ,planet_object{}
+ ,planet_object{}, star_object{}, orbit_object{}
 {
+    //ASSIGNMENT 1 - RENDER PLANETS
+    //Accurate scale based on Earth (source: https://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html)
+    //SUN
+    sun.name = "sun"; //name
+    sun.size = DEFAULT_SIZE * 6.0;
+    sun.distance = 0.0; //stays in the center, doesnt have to move
+    sun.rotation = 0.0; //for the rotation time on renderPlanet
+
+    //MERCURY
+    mercury.name = "mercury"; //name
+    mercury.size = DEFAULT_SIZE * 0.383;
+    mercury.distance = DEFAULT_DIST * 0.387;
+    mercury.rotation = DEFAULT_ROTATION * 0.59;
+
+    //VENUS
+    venus.name = "mercury"; //name
+    venus.size = DEFAULT_SIZE * 0.949;
+    venus.distance = DEFAULT_DIST * 0.723;
+    venus.rotation = DEFAULT_ROTATION * 0.24;
+
+    //EARTH
+    earth.name = "earth"; //name
+    earth.size = DEFAULT_SIZE;
+    earth.distance = DEFAULT_DIST;
+    earth.rotation = DEFAULT_ROTATION;
+
+    //MARS
+    mars.name = "mars"; //name
+    mars.size = DEFAULT_SIZE * 0.532;
+    mars.distance = DEFAULT_DIST * 1.52;
+    mars.rotation = DEFAULT_ROTATION * 1.03;
+
+    //JUPITER
+    jupiter.name = "jupiter"; //name
+    jupiter.size = DEFAULT_SIZE * 6.21;
+    jupiter.distance = DEFAULT_DIST * 3.2;
+    jupiter.rotation = DEFAULT_ROTATION * 0.95;
+
+    //SATURN
+    saturn.name = "saturn";
+    saturn.size = DEFAULT_SIZE * 6.45;
+    saturn.distance = DEFAULT_DIST * 4.58;
+    saturn.rotation = DEFAULT_ROTATION * 0.9;
+
+    //URANUS
+    uranus.name = "uranus";
+    uranus.size = DEFAULT_SIZE * 3.01;
+    uranus.distance = DEFAULT_DIST * 5.2;
+    uranus.rotation = DEFAULT_ROTATION * 0.85;
+
+    //NEPTUNE
+    neptune.name = "neptune";
+    neptune.size = DEFAULT_SIZE * 2.88;
+    neptune.distance = DEFAULT_DIST * 6.05;
+    neptune.rotation = DEFAULT_ROTATION * 0.8;
+
+    //ASSIGNMENT 2 - Make stars and orbits
+
+    //fill buffer for star
+    star_object.num_elements = NUMBER_OF_STARS;
+    makeStars();
+    orbit_object.num_elements = ORBIT_THICKNESS;
+    //Render the orbits of the planets
+    for (int j = 0; j < NUMBER_OF_CEL_BODIES; ++j) {
+        makeOrbits(arrayOfPlanets[j]);//call our custom function
+    }
+    //Assignment 2 - stars and orbit
+    model star_model = {starBuffer, model::POSITION | model::NORMAL};
+    //orbit
+    orbit_model = {orbitBuffer, model::POSITION};
+
   initializeGeometry();
   initializeShaderPrograms();
+
 }
 
 void ApplicationSolar::render() const {
   // bind shader to upload uniforms
-  glUseProgram(m_shaders.at("planet").handle);
+    glUseProgram(m_shaders.at("planet").handle);
 
-  glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
-  model_matrix = glm::translate(model_matrix, glm::fvec3{0.0f, 0.0f, -1.0f});
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                     1, GL_FALSE, glm::value_ptr(model_matrix));
 
-  // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                     1, GL_FALSE, glm::value_ptr(normal_matrix));
+  //ASSIGNMENT 1
+  //RENDER! via a loop
+  for (int i = 0; i < NUMBER_OF_CEL_BODIES; ++i) {
+    renderPlanets(arrayOfPlanets[i]);//call our custom function
+  }
 
-  // bind the VAO to draw
-  glBindVertexArray(planet_object.vertex_AO);
+  //ASSIGNMENT 2 - Render stars and orbits
+  renderStars();
+  renderOrbits();
 
-  // draw bound vertex array using bound shader
-  glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
 }
+
+
+//ASSIGNMENT 1 - RENDER PLANETS
+void ApplicationSolar::renderPlanets(Planet thePlanet) const {
+
+    //1st is the already created matrix obj
+    //2nd parameter rotation values (deg)
+    //3rd parameter is the rotation axis
+    glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * thePlanet.rotation), glm::fvec3{ 0.0f, 1.0f, 0.0f });
+
+    //    VERY IMPORTANT!!!! THE ORDER OF SCALING/ROTATION/TRANSFORMATION WILL AFFECT THE FINAL RESULT AND RENDER!!!!!
+
+
+    //translate first
+    //translate the sphere according to the vector we have in the 2nd param
+    model_matrix = glm::translate(model_matrix, glm::fvec3{ 0.0, 0.0, thePlanet.distance});
+
+    //is this planet earth? Then render the moon around it!
+    if (thePlanet.name == "earth") {
+        //Earth's moon
+        Planet earthmoon;
+        earthmoon.name = "earthmoon"; //name
+        earthmoon.size = DEFAULT_SIZE * 0.272;
+        earthmoon.distance = DEFAULT_DIST * 0.08;
+        earthmoon.rotation = DEFAULT_ROTATION * 0.027;
+
+        //rotation
+        glm::fmat4 model_matrix_moon = glm::rotate(model_matrix, float(glfwGetTime() * earthmoon.rotation), glm::fvec3{ 1.0f, 0.0f, 0.0f });
+
+        //translation
+        model_matrix_moon = glm::translate(model_matrix_moon, glm::fvec3{ 0.0f, 0.0f, earthmoon.distance });
+        // scale
+        model_matrix_moon = glm::scale(model_matrix_moon, glm::fvec3{ earthmoon.size, earthmoon.size, earthmoon.size});
+
+        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                           1, GL_FALSE, glm::value_ptr(model_matrix_moon));
+
+        // extra matrix for normal transformation to keep them orthogonal to surface
+        glm::fmat4 normal_matrix_moon = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix_moon);
+        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                           1, GL_FALSE, glm::value_ptr(normal_matrix_moon));
+
+
+        // bind the VAO to draw
+        glBindVertexArray(planet_object.vertex_AO);
+
+        // draw bound vertex array using bound shader
+        glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+
+    }
+
+    //scale second
+    model_matrix = glm::scale(model_matrix, glm::fvec3(thePlanet.size));
+    //rotate third
+    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * M_PI / 10), glm::fvec3{ 0.0f, 1.0f, 0.0f });
+
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    // extra matrix for normal transformation to keep them orthogonal to surface
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                       1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    //Used for the colors
+
+    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"), 1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+    // bind the VAO to draw
+    glBindVertexArray(planet_object.vertex_AO);
+    // draw bound vertex array using bound shader
+    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+
+}
+
+//ASSIGNMENT 2 - Render stars and orbits
+
+//Stars
+void ApplicationSolar::renderStars() const{
+
+    // bind shader to upload uniforms
+    glUseProgram(m_shaders.at("star").handle);
+    // bind shader to upload uniforms
+    glUseProgram(m_shaders.at("star").handle);
+    // bind the VAO to draw
+    glBindVertexArray(star_object.vertex_AO);
+    //draw all
+    glDrawArrays(GL_POINTS, 0, star_object.num_elements);
+
+    // bind the VAO to draw
+    glBindVertexArray(planet_object.vertex_AO);
+
+    // draw bound vertex array using bound shader
+    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+
+}
+
+//Orbits
+void ApplicationSolar::renderOrbits() const{
+
+    //bind shader and array
+    glUseProgram(m_shaders.at("orbit").handle);
+    glBindVertexArray(orbit_object.vertex_AO);
+
+    //give an orbit to everyone
+    for (int i = 0; i < NUMBER_OF_CEL_BODIES; i++) {
+        //orbit is static, doesn't move
+        glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
+                           1, GL_FALSE, glm::value_ptr(glm::fmat4{}));
+        //draw orbit
+        glDrawArrays(orbit_object.draw_mode, i * orbit_object.num_elements, orbit_object.num_elements);
+    }
+}
+
+
+//ASSIGNMENT 2 - Make the stars' buffer
+void ApplicationSolar::makeStars() {
+
+    //get a random position for each star between the random and the NUMBER_OF_STARS (1000)
+    float randomPos = float(rand() % NUMBER_OF_STARS) / 10;
+
+    for (int i = 0; i < star_object.num_elements; i++){
+
+        starBuffer.push_back(randomPos);
+        starBuffer.push_back(randomPos);
+        starBuffer.push_back(randomPos);
+
+        starBuffer.push_back(randomPos);
+        starBuffer.push_back(randomPos);
+        starBuffer.push_back(randomPos);
+    }
+}
+
+//ASSIGNMENT 2 - Make the orbits' buffer
+void ApplicationSolar::makeOrbits(Planet aPlanet){
+
+    int orbit = ORBIT_THICKNESS;
+    float counter = 2.0 * (float)M_PI / (float)orbit;
+    float dist = aPlanet.distance;
+
+
+    for (float orb = 0; orb < (2 * M_PI); orb += counter) {
+        //x
+        orbitBuffer.push_back(dist * cosf(orb));
+        //y
+        orbitBuffer.push_back(dist * -0.3 * cosf(orb));
+        //z
+        orbitBuffer.push_back(dist * sinf(orb));
+
+    }
+}
+
 
 void ApplicationSolar::updateView() {
   // vertices are transformed in camera space, so camera transform must be inverted
@@ -65,29 +303,69 @@ void ApplicationSolar::updateProjection() {
 // update uniform locations
 void ApplicationSolar::uploadUniforms() {
   updateUniformLocations();
-  
+
   // bind new shader
   glUseProgram(m_shaders.at("planet").handle);
-  
+
   updateView();
   updateProjection();
 }
 
 // handle key input
 void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) {
-  if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
-    updateView();
-  }
-  else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-    m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
-    updateView();
-  }
+    //move scene toward camera
+    if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.3f});
+        updateView();
+    }
+        // move scene away from camera
+    else if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.3f});
+        updateView();
+    }
+        // move scene right
+    else if (key == GLFW_KEY_A && action != GLFW_RELEASE) {
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{ -1.0f, 0.0f, 0.0f });
+        updateView();
+    }
+        //move scene left
+    else if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{ 1.0f, 0.0f, 0.0f });
+        updateView();
+    }
+
 }
 
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
   // mouse handling
+    // mouse handling
+    float x = 0.0f;
+    float y = 0.0f;
+
+    //move the camera according to the mouse
+    const float moveMouseX = 0.9f;
+    const float moveMouseY = 0.3f;
+    //    Move in X
+    if (pos_x > 0) {
+        x = -moveMouseX;
+    }
+    else if (pos_x < 0) {
+        x = moveMouseX;
+    }
+    //    Move in Y
+    if (pos_y > 0) {
+        y = -moveMouseY;
+    }
+    else if (pos_y < 0) {
+        y = moveMouseY;
+    }
+    // If the rotation of the mouse changes, you should too
+
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(x), glm::fvec3{ 0.0f, 1.0f, 0.0f });
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(y), glm::fvec3{ 1.0f, 0.0f, 0.0f });
+
+    updateView();
 }
 
 // load shader programs
@@ -100,11 +378,22 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+
+    // add star shader here
+    m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
+                                             m_resource_path + "shaders/star.frag"});
+
+    // add orbit shader here
+    m_shaders.emplace("orbit", shader_program{m_resource_path + "shaders/orbit.vert",
+                                              m_resource_path + "shaders/orbit.frag"});
+    // request uniform locations for shader program
+    m_shaders.at("orbit").u_locs["ModelMatrix"] = -1;
 }
 
 // load models
 void ApplicationSolar::initializeGeometry() {
   model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -136,14 +425,78 @@ void ApplicationSolar::initializeGeometry() {
 
   // store type of primitive to draw
   planet_object.draw_mode = GL_TRIANGLES;
-  // transfer number of indices to model object 
+  // transfer number of indices to model object
   planet_object.num_elements = GLsizei(planet_model.indices.size());
+
+    //======================================================================
+    // star initialisation - lecture 4 slide 8
+
+
+    //generate vertex array object
+    glGenVertexArrays(1, &star_object.vertex_AO);
+    // bind the array for attaching buffers
+    glBindVertexArray(star_object.vertex_AO);
+
+    // generate generic buffer
+    glGenBuffers(1, &star_object.vertex_BO);
+    // bind this as an vertex array buffer containing all attributes
+    glBindBuffer(GL_ARRAY_BUFFER, star_object.vertex_BO);
+    // configure currently bound array buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * star_model.data.size(), star_model.data.data(), GL_STATIC_DRAW);
+
+
+
+    // activate first attribute on gpu - position
+    glEnableVertexAttribArray(0);
+    // first attribute is 3 floats with no offset & stride
+
+    //reinstate
+    glVertexAttribPointer(0, star_model.POSITION.components, star_model.POSITION.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::POSITION]);
+
+
+    // activate second attribute on gpu - colour
+    glEnableVertexAttribArray(1);
+    // second attribute is 3 floats with offset & stride of 3 floats
+
+    glVertexAttribPointer(1, star_model.NORMAL.components, star_model.NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::NORMAL]);
+
+
+    // end star initialisation
+    //======================================================================
+    //orbit initialisation
+
+
+    // generate vertex array object
+    glGenVertexArrays(1, &orbit_object.vertex_AO);
+    // bind the array for attaching buffers
+    glBindVertexArray(orbit_object.vertex_AO);
+
+    // generate generic buffer
+    glGenBuffers(1, &orbit_object.vertex_BO);
+    // bind this as an vertex array buffer containing all attributes
+    glBindBuffer(GL_ARRAY_BUFFER, orbit_object.vertex_BO);
+    // configure currently bound array buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * orbit_model.data.size(), orbit_model.data.data(), GL_STATIC_DRAW);
+
+    // activate first attribute on gpu
+    glEnableVertexAttribArray(0);
+    // first attribute is 3 floats with no offset & stride
+
+    glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, orbit_model.vertex_bytes, orbit_model.offsets[model::POSITION]);
+
+    // store type of primitive to draw
+    orbit_object.draw_mode = GL_LINE_LOOP;
+
 }
 
 ApplicationSolar::~ApplicationSolar() {
   glDeleteBuffers(1, &planet_object.vertex_BO);
   glDeleteBuffers(1, &planet_object.element_BO);
   glDeleteVertexArrays(1, &planet_object.vertex_AO);
+    glDeleteBuffers(1, &star_object.vertex_BO);
+    glDeleteVertexArrays(1, &star_object.vertex_AO);
+    glDeleteBuffers(1, &orbit_object.vertex_BO);
+    glDeleteVertexArrays(1, &orbit_object.vertex_AO);
 }
 
 // exe entry point
