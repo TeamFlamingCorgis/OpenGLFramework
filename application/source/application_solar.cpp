@@ -379,11 +379,11 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 
-    // add star shader here
+    // star shader
     m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
                                              m_resource_path + "shaders/star.frag"});
 
-    // add orbit shader here
+    // orbit shader
     m_shaders.emplace("orbit", shader_program{m_resource_path + "shaders/orbit.vert",
                                               m_resource_path + "shaders/orbit.frag"});
     // request uniform locations for shader program
@@ -428,10 +428,7 @@ void ApplicationSolar::initializeGeometry() {
   // transfer number of indices to model object
   planet_object.num_elements = GLsizei(planet_model.indices.size());
 
-    //======================================================================
-    // star initialisation - lecture 4 slide 8
-
-
+  //STARS
     //generate vertex array object
     glGenVertexArrays(1, &star_object.vertex_AO);
     // bind the array for attaching buffers
@@ -461,11 +458,7 @@ void ApplicationSolar::initializeGeometry() {
     glVertexAttribPointer(1, star_model.NORMAL.components, star_model.NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::NORMAL]);
 
 
-    // end star initialisation
-    //======================================================================
-    //orbit initialisation
-
-
+    // ORBIT
     // generate vertex array object
     glGenVertexArrays(1, &orbit_object.vertex_AO);
     // bind the array for attaching buffers
