@@ -19,6 +19,12 @@ using namespace gl;
 
 #include <iostream>
 
+//use constants from glm
+#ifndef GLM_GTC_constants
+#define GLM_GTC_constants
+#endif
+#include <glm/gtc/constants.hpp>
+
 //Define planets and moon
 #define  NUMBER_OF_CEL_BODIES 9
 #define  NUMBER_OF_STARS 1000
@@ -187,7 +193,7 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const {
     //scale second
     model_matrix = glm::scale(model_matrix, glm::fvec3(thePlanet.size));
     //rotate third
-    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * M_PI / 10), glm::fvec3{ 0.0f, 1.0f, 0.0f });
+	model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * glm::pi<float>() / 10.0), glm::fvec3{ 0.0f, 1.0f, 0.0f });
 
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
 
@@ -270,11 +276,11 @@ void ApplicationSolar::makeStars() {
 void ApplicationSolar::makeOrbits(Planet aPlanet){
 
     int orbit = ORBIT_THICKNESS;
-    float counter = 2.0 * (float)M_PI / (float)orbit;
+    float counter = 2.0 * glm::pi<float>() / (float)orbit;
     float dist = aPlanet.distance;
 
 
-    for (float orb = 0; orb < (2 * M_PI); orb += counter) {
+    for (float orb = 0; orb < (2 * glm::pi<float>()); orb += counter) {
         //x
         orbitBuffer.push_back(dist * cosf(orb));
         //y
