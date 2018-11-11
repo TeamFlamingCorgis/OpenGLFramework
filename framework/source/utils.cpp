@@ -112,7 +112,7 @@ std::string read_file(std::string const& name) {
       std::getline(ifile, line);
       filetext.append(line + "\n");
     }
-    
+
     return filetext; 
   }
   else {

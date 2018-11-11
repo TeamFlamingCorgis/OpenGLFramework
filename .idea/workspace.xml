@@ -2,9 +2,9 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
     <generated>
+      <config projectName="OpenGL_Framework" targetName="framework" />
       <config projectName="OpenGL_Framework" targetName="glbinding" />
       <config projectName="OpenGL_Framework" targetName="glfw" />
-      <config projectName="OpenGL_Framework" targetName="framework" />
       <config projectName="OpenGL_Framework" targetName="solar_system" />
     </generated>
   </component>
@@ -15,11 +15,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c42ff90a-7c42-42ed-ae38-81f8d06075b1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/include/application_solar.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/application/include/application_solar.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/include/planet.h" beforeDir="false" afterPath="$PROJECT_DIR$/application/include/planet.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/application/source/application_solar.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/application/source/application_solar.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/framework.dir/CXX.includecache" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/framework.dir/CXX.includecache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/solar_system.dir/CXX.includecache" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/solar_system.dir/CXX.includecache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Debug/libframework.a" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Debug/libframework.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Debug/libglfw3.a" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Debug/libglfw3.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Debug/solar_system" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/CMakeFiles/git-data/head-ref" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/CMakeFiles/git-data/head-ref" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/VERSION" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/VERSION" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/libglbindingd.a" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/libglbindingd.a" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/source/include/glbinding/glbinding-version.h" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/external/glbinding-2.1.1/source/include/glbinding/glbinding-version.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/framework/source/utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/framework/source/utils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/models/sphere.obj" beforeDir="false" afterPath="$PROJECT_DIR$/resources/models/sphere.obj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/emulation.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/emulation.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/emulation.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/emulation.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/orbit.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/orbit.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/orbit.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/orbit.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/simple.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/simple.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/simple.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/simple.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/star.frag" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/star.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/star.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/star.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/uniform.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/uniform.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/shaders/vao.vert" beforeDir="false" afterPath="$PROJECT_DIR$/resources/shaders/vao.vert" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -33,41 +53,44 @@
     <session id="571877584">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="5" />
-          <entry key="project.open.time.1" value="2" />
+          <entry key="project.closed" value="6" />
+          <entry key="project.open.time.1" value="3" />
           <entry key="project.open.time.12" value="1" />
           <entry key="project.open.time.5" value="1" />
           <entry key="project.open.time.8" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="6" />
+          <entry key="project.opened" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="cpp" value="5" />
-          <entry key="frag" value="1" />
-          <entry key="h" value="1" />
-          <entry key="hpp" value="1" />
+          <entry key="cpp" value="21" />
+          <entry key="frag" value="13" />
+          <entry key="h" value="4" />
+          <entry key="hpp" value="8" />
           <entry key="inl" value="2" />
-          <entry key="vert" value="1" />
+          <entry key="map" value="1" />
+          <entry key="vert" value="19" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="GLSL shader file" value="2" />
-          <entry key="ObjectiveC" value="9" />
+          <entry key="GLSL shader file" value="32" />
+          <entry key="ObjectiveC" value="36" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="cpp" value="2349" />
-          <entry key="h" value="28" />
-          <entry key="hpp" value="287" />
+          <entry key="cpp" value="4267" />
+          <entry key="h" value="86" />
+          <entry key="hpp" value="864" />
+          <entry key="vert" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="ObjectiveC" value="2664" />
+          <entry key="GLSL shader file" value="5" />
+          <entry key="ObjectiveC" value="5217" />
         </counts>
       </usages-collector>
     </session>
@@ -77,8 +100,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application/source/application_solar.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-252">
-              <caret line="460" column="12" selection-start-line="460" selection-start-column="12" selection-end-line="460" selection-end-column="12" />
+            <state relative-caret-position="72">
+              <caret line="379" column="97" selection-start-line="379" selection-start-column="97" selection-end-line="379" selection-end-column="97" />
               <folding>
                 <element signature="e#0#32#0" expanded="true" />
                 <element signature="e#284#307#0" expanded="true" />
@@ -88,40 +111,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/framework/source/launcher.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="188" selection-start-line="188" selection-end-line="188" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/external/glbinding-2.1.1/source/glbinding/include/glbinding/Function.inl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="20" selection-start-line="20" selection-end-line="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/application/include/planet.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
-              <folding>
-                <element signature="e#68#87#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/application/include/application_solar.hpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="33" column="21" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
+            <state relative-caret-position="-362">
+              <caret line="48" column="22" lean-forward="true" selection-start-line="48" selection-start-column="22" selection-end-line="48" selection-end-column="22" />
               <folding>
                 <element signature="e#61#87#0" expanded="true" />
               </folding>
@@ -143,11 +136,26 @@
       <find>renderPl</find>
       <find>star_mode</find>
       <find>star_object.</find>
+      <find>neptune.</find>
+      <find>rotation =</find>
+      <find>Planet</find>
+      <find>model plan</find>
+      <find>model pla</find>
+      <find>ProjectionMa</find>
+      <find>initi</find>
+      <find>shad</find>
+      <find>M_PI</find>
+      <find>vertex_AO</find>
+      <find>renderOr</find>
+      <find>makeO</find>
+      <find>makeS</find>
+      <find>randP</find>
     </findStrings>
     <replaceStrings>
       <replace>dista</replace>
       <replace>bufferStars</replace>
       <replace>makeStars</replace>
+      <replace>glm::pi&lt;float&gt;()</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$</dir>
@@ -159,7 +167,13 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/framework/include/structs.hpp" />
         <option value="$PROJECT_DIR$/application/include/planet.h" />
+        <option value="$PROJECT_DIR$/framework/source/utils.cpp" />
+        <option value="$PROJECT_DIR$/resources/shaders/star.frag" />
+        <option value="$PROJECT_DIR$/resources/shaders/orbit.vert" />
+        <option value="$PROJECT_DIR$/resources/shaders/orbit.frag" />
+        <option value="$PROJECT_DIR$/resources/shaders/star.vert" />
         <option value="$PROJECT_DIR$/application/include/application_solar.hpp" />
         <option value="$PROJECT_DIR$/application/source/application_solar.cpp" />
       </list>
@@ -251,6 +265,12 @@
               <item name="OpenGL_Framework" type="b2602c69:ProjectViewProjectNode" />
               <item name="cg_assignments" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="OpenGL_Framework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cg_assignments" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
               <item name="shaders" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -325,17 +345,18 @@
       <workItem from="1541613556979" duration="4000" />
       <workItem from="1541613979439" duration="3521000" />
       <workItem from="1541620498723" duration="7498000" />
+      <workItem from="1541963161506" duration="16808000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16823000" />
+    <option name="totallyTimeSpent" value="33880000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26752505" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27825466" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -376,37 +397,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/framework/source/model_loader.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1714" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/application/include/planet.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
-          <folding>
-            <element signature="e#68#87#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/application/include/application_solar.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="33" column="21" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
-          <folding>
-            <element signature="e#61#87#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/shaders/star.frag">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/shaders/star.vert">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/external/glbinding-2.1.1/source/glbinding/include/glbinding/Function.inl">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -414,17 +404,152 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/framework/source/launcher.cpp">
+    <entry file="file://$PROJECT_DIR$/framework/source/model_loader.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
-          <caret line="188" selection-start-line="188" selection-end-line="188" />
+          <caret line="65" selection-start-line="65" selection-end-line="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/include/structs.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="359">
+          <caret line="45" column="2" selection-start-line="45" selection-start-column="2" selection-end-line="45" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/application/include/planet.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="37" selection-start-line="13" selection-start-column="37" selection-end-line="13" selection-end-column="37" />
+          <folding>
+            <element signature="e#68#87#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/source/utils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="114" column="4" selection-start-line="114" selection-start-column="4" selection-end-line="114" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/include/launcher.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="29" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../../../star 2.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" selection-start-line="7" selection-end-line="10" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../../../../orbit 2.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" selection-start-line="5" selection-end-line="8" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/vao.vert">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/uniform.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="1" lean-forward="true" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/source/shader_loader.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-346">
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/emulation.frag">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/emulation.vert">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/simple.vert">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/simple.frag">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/star.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/star.frag">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/orbit.frag">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/shaders/orbit.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" lean-forward="true" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Desktop/cg_assignments-1820f67e1a2ccd46a5b8acf018d08fdbd085f5bb/application/source/application_solar.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1067">
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="1388" selection-start-line="1388" selection-end-line="1388" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/source/launcher.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="269" selection-start-line="269" selection-end-line="269" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/application/include/application_solar.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-362">
+          <caret line="48" column="22" lean-forward="true" selection-start-line="48" selection-start-column="22" selection-end-line="48" selection-end-column="22" />
+          <folding>
+            <element signature="e#61#87#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/application/source/application_solar.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-252">
-          <caret line="460" column="12" selection-start-line="460" selection-start-column="12" selection-end-line="460" selection-end-column="12" />
+        <state relative-caret-position="72">
+          <caret line="379" column="97" selection-start-line="379" selection-start-column="97" selection-end-line="379" selection-end-column="97" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
             <element signature="e#284#307#0" expanded="true" />

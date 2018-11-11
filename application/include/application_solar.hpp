@@ -5,6 +5,12 @@
 #include "model.hpp"
 #include "structs.hpp"
 #include "planet.h" //ASSIGNMENT 1
+//Define planets and moon
+#define  NUMBER_OF_CEL_BODIES 10
+#define  DEFAULT_SIZE 0.4 //Default sun size
+//Declare defaults for the min distance from the sun, the default for rotation, orbit, and speed time
+#define  DEFAULT_DIST 0.4 * 20.0
+#define  DEFAULT_ROTATION 0.5
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -25,29 +31,114 @@ class ApplicationSolar : public Application {
 
   // draw all objects
   void render() const;
-    //Render planets
-    void renderPlanets(Planet thePlanet) const;
-    //Assignment 2 - Make stars and orbits
-    void makeStars();
-    void renderStars() const;
-    void makeOrbits(Planet aPlanet);
-    void renderOrbits() const;
-
-    //Assignment 2 - buffers for star and orbit
-    std::vector<float> orbitBuffer;
-    std::vector<float> starBuffer;
 
  protected:
   void initializeShaderPrograms();
   void initializeGeometry();
   void updateView();
+  //ASSIGNMENT 1
+  //Render planets
+  void renderPlanets(Planet thePlanet) const;
+  //ASSIGNMENT 2 - render stars and orbits
+  void renderStars() const;
+  void renderOrbits() const;
 
-  // cpu representation of model
-  model_object planet_object;
 
-  //Assignment 2 - Star model and orbit model
-  model_object star_object;
-  model_object orbit_object;
+    std::vector< float > starBuffer;
+    std::vector< float > orbitBuffer;
+    void makeOrbits();
+    float randPos();
+    float randCol();
+
+    // cpu representation of model
+    model_object planet_object;
+    //ASSIGNMENT 2 - model objects of stars and orbits
+    model_object star_object;
+    model_object orbit_object;
+  
+  //ASSIGNMENT 1 - MOVED HERE TO MAKE IT GLOBAL!!!
+  Planet arrayOfPlanets[NUMBER_OF_CEL_BODIES] ={
+          {
+            //SUN
+            "sun", //name
+            DEFAULT_SIZE * 6.0,
+            0.0, //stays in the center, doesnt have to move
+            0.0, //for the rotation time on renderPlanet
+            "sun" //are you a sun, a planet, or a star?
+          },
+          {
+            //MERCURY
+            "mercury", //name
+            DEFAULT_SIZE * 0.383,
+            DEFAULT_DIST * 0.387,
+            DEFAULT_ROTATION * 0.59,
+            "planet"
+          },
+          {
+            //VENUS
+            "mercury", //name
+            DEFAULT_SIZE * 0.949,
+            DEFAULT_DIST * 0.723,
+            DEFAULT_ROTATION * 0.24,
+            "planet"
+          },
+          {
+            //EARTH
+            "earth", //name
+            DEFAULT_SIZE,
+            DEFAULT_DIST,
+            DEFAULT_ROTATION,
+            "planet"
+          },
+          {
+            //EARTH'S MOON
+            "earthmoon", //name
+            DEFAULT_SIZE * 0.0272,
+            DEFAULT_DIST * 0.08,
+            DEFAULT_ROTATION * 0.027,
+            "moon"
+          },
+          {
+            //MARS
+            "mars", //name
+            DEFAULT_SIZE * 0.532,
+            DEFAULT_DIST * 1.52,
+            DEFAULT_ROTATION * 1.03,
+            "planet"
+          },
+          {
+            //JUPITER
+            "jupiter", //name
+            DEFAULT_SIZE * 6.21,
+            DEFAULT_DIST * 3.2,
+            DEFAULT_ROTATION * 0.95,
+            "planet"
+          },
+          {
+            //SATURN
+            "saturn",
+            DEFAULT_SIZE * 6.45,
+            DEFAULT_DIST * 4.58,
+            DEFAULT_ROTATION * 0.9,
+            "planet"
+          },
+          {
+            //URANUS
+            "uranus",
+            DEFAULT_SIZE * 3.01,
+            DEFAULT_DIST * 5.2,
+            DEFAULT_ROTATION * 0.85,
+            "planet"
+          },
+          {
+            //NEPTUNE
+            "neptune",
+            DEFAULT_SIZE * 2.88,
+            DEFAULT_DIST * 6.05,
+            DEFAULT_ROTATION * 0.8,
+            "planet"
+          }
+  };
 };
 
 #endif

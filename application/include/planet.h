@@ -11,6 +11,7 @@ struct Planet {
     float size; //size
     float distance; //distance
     float rotation; //rotation
+    string type;//sun, planet or star
 };
 
 
