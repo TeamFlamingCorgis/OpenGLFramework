@@ -7,10 +7,10 @@
 #include "planet.h" //ASSIGNMENT 1
 //Define planets and moon
 #define  NUMBER_OF_CEL_BODIES 10
-#define  DEFAULT_SIZE 0.4 //Default sun size
+#define  DEFAULT_SIZE 0.4f //Default sun size
 //Declare defaults for the min distance from the sun, the default for rotation, orbit, and speed time
-#define  DEFAULT_DIST 0.4 * 20.0
-#define  DEFAULT_ROTATION 0.5
+#define  DEFAULT_DIST 0.4f * 20.0f
+#define  DEFAULT_ROTATION 0.5f
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -65,7 +65,7 @@ class ApplicationSolar : public Application {
             0.0f, //stays in the center, doesnt have to move
             0.0f, //for the rotation time on renderPlanet
             "sun", //are you a sun, a planet, or a star?
-            {184,239,52} //color from rgb: thisColor = rgbValue / 255 (to fit the req from OpenGL)
+            {252,252,79} //color from rgb: thisColor = rgbValue / 255 (to fit the req from OpenGL)
           },
           {
             //MERCURY
@@ -74,7 +74,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 0.387f,
             DEFAULT_ROTATION * 0.59f,
             "planet",
-            {184,239, 52}
+            {231,0,0}
           },
           {
             //VENUS
@@ -83,7 +83,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 0.723f,
             DEFAULT_ROTATION * 0.24f,
             "planet",
-            {184,239, 52}
+            {255,140,0}
           },
           {
             //EARTH
@@ -92,7 +92,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST,
             DEFAULT_ROTATION,
             "planet",
-            {184,239, 52}
+            {12,187,230}
           },
           {
             //EARTH'S MOON
@@ -101,7 +101,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 0.08f,
             DEFAULT_ROTATION * 0.027f,
             "moon",
-            {184,239, 52}
+            {112,110,110}
           },
           {
             //MARS
@@ -110,7 +110,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 1.52f,
             DEFAULT_ROTATION * 1.03f,
             "planet",
-            {184,239, 52}
+            {255,239,0}
           },
           {
             //JUPITER
@@ -119,7 +119,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 3.2f,
             DEFAULT_ROTATION * 0.95f,
             "planet",
-            {184,239, 52}
+            {0,129,31}
           },
           {
             //SATURN
@@ -128,7 +128,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 4.58f,
             DEFAULT_ROTATION * 0.9f,
             "planet",
-            {184,239, 52}
+            {118,0,137}
           },
           {
             //URANUS
@@ -137,7 +137,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 5.2f,
             DEFAULT_ROTATION * 0.85f,
             "planet",
-            {184,239, 52}
+            {0,68,255}
           },
           {
             //NEPTUNE
@@ -146,7 +146,7 @@ class ApplicationSolar : public Application {
             DEFAULT_DIST * 6.05f,
             DEFAULT_ROTATION * 0.8f,
             "planet",
-            {184,239, 52}
+            {251,4,75}
           }
   };
 };
