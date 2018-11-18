@@ -64,7 +64,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 6.0,
             0.0, //stays in the center, doesnt have to move
             0.0, //for the rotation time on renderPlanet
-            "sun" //are you a sun, a planet, or a star?
+            "sun", //are you a sun, a planet, or a star?
+            {184,239,52} //color from rgb: thisColor = rgbValue / 255 (to fit the req from OpenGL)
           },
           {
             //MERCURY
@@ -72,7 +73,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 0.383,
             DEFAULT_DIST * 0.387,
             DEFAULT_ROTATION * 0.59,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //VENUS
@@ -80,7 +82,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 0.949,
             DEFAULT_DIST * 0.723,
             DEFAULT_ROTATION * 0.24,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //EARTH
@@ -88,7 +91,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE,
             DEFAULT_DIST,
             DEFAULT_ROTATION,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //EARTH'S MOON
@@ -96,7 +100,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 0.0272,
             DEFAULT_DIST * 0.08,
             DEFAULT_ROTATION * 0.027,
-            "moon"
+            "moon",
+            {184,239, 52}
           },
           {
             //MARS
@@ -104,7 +109,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 0.532,
             DEFAULT_DIST * 1.52,
             DEFAULT_ROTATION * 1.03,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //JUPITER
@@ -112,7 +118,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 6.21,
             DEFAULT_DIST * 3.2,
             DEFAULT_ROTATION * 0.95,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //SATURN
@@ -120,7 +127,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 6.45,
             DEFAULT_DIST * 4.58,
             DEFAULT_ROTATION * 0.9,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //URANUS
@@ -128,7 +136,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 3.01,
             DEFAULT_DIST * 5.2,
             DEFAULT_ROTATION * 0.85,
-            "planet"
+            "planet",
+            {184,239, 52}
           },
           {
             //NEPTUNE
@@ -136,7 +145,8 @@ class ApplicationSolar : public Application {
             DEFAULT_SIZE * 2.88,
             DEFAULT_DIST * 6.05,
             DEFAULT_ROTATION * 0.8,
-            "planet"
+            "planet",
+            {184,239, 52}
           }
   };
 };

@@ -9,7 +9,7 @@
 #define GLBINDING_VERSION_MAJOR       "2"
 #define GLBINDING_VERSION_MINOR       "1"
 #define GLBINDING_VERSION_PATCH       "1"
-#define GLBINDING_VERSION_REVISION    "c3297e934d91"
+#define GLBINDING_VERSION_REVISION    "66038381f54d"
 
 #define GLBINDING_VERSION             "2.1.1"
-#define GLBINDING_NAME_VERSION        "glbinding v2.1.1 (c3297e934d91)"
+#define GLBINDING_NAME_VERSION        "glbinding v2.1.1 (66038381f54d)"

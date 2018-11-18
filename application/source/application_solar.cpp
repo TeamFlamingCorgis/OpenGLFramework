@@ -101,7 +101,7 @@ void ApplicationSolar::render() const {
 
     //ASSIGNMENT 2
     renderStars();
-    renderOrbits();
+//    renderOrbits();
 
 }
 
@@ -140,6 +140,9 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const{
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                            1, GL_FALSE, glm::value_ptr(normal_matrix_moon));
 
+        //ASSIGNMENT 3 - Color for the moon
+        glm::vec3 earthmoonColor = earthmoon.color;
+        glUniform3fv(m_shaders.at("planet").u_locs.at("DiffuseColor"), 1, glm::value_ptr(earthmoonColor));
 
         // bind the VAO to draw
         glBindVertexArray(planet_object.vertex_AO);
@@ -159,6 +162,26 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const{
     // extra matrix for normal transformation to keep them orthogonal to surface
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    //ASSIGNMENT 3 - Render colors here!
+    //GEt the color from the struct:
+    glm::vec3 planetColour = {thePlanet.color[0]/255, thePlanet.color[1]/255, thePlanet.color[2]/255};
+    //Pass it to the shader
+    glUniform3fv(m_shaders.at("planet").u_locs.at("DiffuseColor"), 1, glm::value_ptr(planetColour));
+
+    //ASSIGNMENT 3 - Light source: the sun
+    //Be brighty bright Sun! This will be the source for the light of the entire system
+    glm::fmat4 view_matrix = glm::inverse(m_view_transform);
+    glm::vec4 origin;
+    if (thePlanet.name == "sun" ) {
+        origin = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);//initialize origin of light for the sun
+    }else {
+        origin = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);//initialize origin of light for the planets
+
+    }
+    //multiply by view matrix and upload to shader
+    glm::vec3 sunPos(view_matrix * origin);
+    glUniform3fv(m_shaders.at("planet").u_locs.at("sunPosition"), 1, glm::value_ptr(sunPos));
 
     // bind the VAO to draw
     glBindVertexArray(planet_object.vertex_AO);
@@ -249,6 +272,18 @@ void ApplicationSolar::renderStars() const{
 void ApplicationSolar::updateView() {
     // vertices are transformed in camera space, so camera transform must be inverted
     glm::fmat4 view_matrix = glm::inverse(m_view_transform);
+
+    glUseProgram(m_shaders.at("planet").handle);
+
+    //ASSIGNMENT 3 - light source for sun and planets
+    //added for assignment 3 - upload sun's position to planet shader
+    //create vec 4 of light origin (sun)
+    glm::vec4 origin(0.0f, 0.0f, 0.0f, 1.0f);
+    //multiply by view matrix and upload to shaders
+    glm::vec3 sunPos(view_matrix * origin);
+    glUniform3fv(m_shaders.at("planet").u_locs.at("sunPosition"), 1, glm::value_ptr(sunPos));
+
+
     // upload matrix to gpu
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ViewMatrix"),
                        1, GL_FALSE, glm::value_ptr(view_matrix));
@@ -313,6 +348,21 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
         updateView();
     }
 
+    //ASSIGNMENT 3 - Switching using the keyboard
+    //switch between shading modes - mode 1
+    else if (key == GLFW_KEY_1 && action != GLFW_PRESS) {
+
+        glUseProgram(m_shaders.at("planet").handle);
+        glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 1);
+
+    }
+        //switch between shading modes - mode 2
+    else if (key == GLFW_KEY_2 && action != GLFW_PRESS) {
+        glUseProgram(m_shaders.at("planet").handle);
+        glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2);
+
+    }
+
 }
 
 //handle delta mouse movement input
@@ -358,6 +408,11 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
     m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 
+    //ASSIGNMENT 3 - Add source of light, diffuse color, and shader mode
+    m_shaders.at("planet").u_locs["sunPosition"] = -1;
+    m_shaders.at("planet").u_locs["DiffuseColor"] = -1;
+    m_shaders.at("planet").u_locs["ShaderMode"] = -1;
+
 
     // add star shader here
     m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
@@ -395,10 +450,12 @@ void ApplicationSolar::initializeGeometry() {
     glEnableVertexAttribArray(0);
     // first attribute is 3 floats with no offset & stride
     glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::POSITION]);
+
     // activate second attribute on gpu
     glEnableVertexAttribArray(1);
     // second attribute is 3 floats with no offset & stride
     glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
+
 
     // generate generic buffer
     glGenBuffers(1, &planet_object.element_BO);
