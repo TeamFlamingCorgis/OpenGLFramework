@@ -173,14 +173,18 @@ void ApplicationSolar::makeOrbits() {
     //If it's not the sun, render the orbit
     for (int i = 1; i < NUMBER_OF_CEL_BODIES; i++) {
         Planet aPlanet = ApplicationSolar::arrayOfPlanets[i];
-
+		////create orbit with diameter 1 and scale before rendering
         int orbit = ORBIT_THICKNESS;
         float counter = 2.0 * glm::pi<float>() / (float)orbit;
         float dist = aPlanet.distance;
+		
+		////try a while loop
 
         for (float orb = 0; orb < (2 * glm::pi<float>()); orb += counter) {
             //x
             orbitBuffer.push_back(dist * cosf(orb));
+
+			////only x and z needed
             //y
             orbitBuffer.push_back(dist * -0.3 * cosf(orb));
             //z
@@ -212,6 +216,8 @@ void ApplicationSolar::renderOrbits() const{
             glDrawArrays(orbit_object.draw_mode, i * orbit_object.num_elements, orbit_object.num_elements);
 
             //if this planet has a moon
+			////If it is not the moon use the parent matrixmodel matrix and render it
+
             if (arrayOfPlanets[i].name == "earth") {
 
                 Planet earth = arrayOfPlanets[i];
@@ -219,13 +225,15 @@ void ApplicationSolar::renderOrbits() const{
                 //create rotated and translated matrix with planet information
                 glm::fmat4 m_earth = glm::rotate(glm::fmat4{}, float(glfwGetTime() * earth.rotation), glm::fvec3{ 0.0f, 1.0f, 0.0f });
                 m_earth = glm::translate(m_earth, glm::fvec3{ 0.0f, 0.0f, earth.rotation });
-                m_earth = glm::rotate(m_earth, float (M_PI / 2.f), glm::fvec3{ 0.0f, 0.0f, 1.0f });
+                m_earth = glm::rotate(m_earth, glm::pi<float>() / 2.f, glm::fvec3{ 0.0f, 0.0f, 1.0f });
 
                 //update shader model matrix
                 glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
                                    1, GL_FALSE, glm::value_ptr(m_earth));
 
                 //draw orbit
+				////why are we using different metric?
+
                 glDrawArrays(orbit_object.draw_mode, i * 100, orbit_object.num_elements);
 
             }
