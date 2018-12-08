@@ -966,6 +966,14 @@ model.hpp
 tiny_obj_loader.h
 ../framework/include/tiny_obj_loader.h
 
+../framework/include/pixel_data.hpp
+vector
+-
+cstdint
+-
+glbinding/gl/enum.h
+-
+
 ../framework/include/shader_loader.hpp
 glbinding/gl/enum.h
 -
@@ -976,6 +984,12 @@ string
 map
 -
 glbinding/gl/gl.h
+-
+
+../framework/include/texture_loader.hpp
+pixel_data.hpp
+../framework/include/pixel_data.hpp
+string
 -
 
 ../framework/include/utils.hpp
@@ -993,6 +1007,8 @@ shader_loader.hpp
 /Users/zeroliam/Documents/HCI 1719/WiSe 2018/Computer Graphics/Homework Project/2018 hw/cg_assignments/application/source/shader_loader.hpp
 model_loader.hpp
 /Users/zeroliam/Documents/HCI 1719/WiSe 2018/Computer Graphics/Homework Project/2018 hw/cg_assignments/application/source/model_loader.hpp
+texture_loader.hpp
+/Users/zeroliam/Documents/HCI 1719/WiSe 2018/Computer Graphics/Homework Project/2018 hw/cg_assignments/application/source/texture_loader.hpp
 glbinding/gl/gl.h
 -
 GLFW/glfw3.h

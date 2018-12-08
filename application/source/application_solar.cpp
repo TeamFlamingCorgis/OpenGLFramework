@@ -4,6 +4,7 @@
 #include "utils.hpp"
 #include "shader_loader.hpp"
 #include "model_loader.hpp"
+#include "texture_loader.hpp"
 
 #include <glbinding/gl/gl.h>
 // use gl definitions from glbinding
@@ -36,14 +37,11 @@ using namespace gl;
 model planet_model{};
 model star_model{};
 model orbit_model{};
-
-//Planet sun, mercury, venus, earth, earthmoon, mars, jupiter, saturn, uranus, neptune;
-////gather all the planets in an array
-//Planet arrayOfPlanets[NUMBER_OF_CEL_BODIES] = { sun, mercury, venus, earth, earthmoon, mars, jupiter, saturn, uranus, neptune };
+model skybox_model{};
 
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
- , planet_object{}, star_object{}, orbit_object{}
+ , planet_object{}, star_object{}, orbit_object{}, skybox_object{}
 {
 
     //ASSIGNMENT 2 - BUFFER FOR STARS
@@ -65,24 +63,111 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
     orbit_object.num_elements = ORBIT_THICKNESS;
     makeOrbits();
 
+    //ASSIGNMENT 4 - Load textures
+    //load textures
+    loadAllTextures();
+    //load normal map
+    loadNormalMap(GL_TEXTURE12);
+
 
     //MODELS GO HERE
     //planet
-//    model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+    model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD | model::TANGENT);
     //stars only use colors
     star_model = {starBuffer, model::POSITION | model::NORMAL};
     //orbit only use position
     orbit_model = {orbitBuffer, model::POSITION};
+    //Skybox model
+    skybox_model = {skyBoxBuffer, model::POSITION};
+
+    //set starting view
+    m_view_transform = glm::translate(m_view_transform, glm::fvec3{ 0.0f, 0.0f, 10.0f });
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(-10.0f), glm::fvec3{ 1.0f, 0.0f, 0.0f });
 
 
-  initializeGeometry();
-  initializeShaderPrograms();
+    //initialisations
+    initializeGeometry();
+    initializeShaderPrograms();
+}
 
-  //set starting view
-  m_view_transform = glm::translate(m_view_transform, glm::fvec3{ 0.0f, 2.0f, 20.0f });
-  m_view_transform = glm::rotate(m_view_transform, glm::radians(-10.0f), glm::fvec3{ 1.0f, 0.0f, 0.0f });
+//ASSSIGNMENT 4 - Load all textures for the planets
+void ApplicationSolar::loadAllTextures(){
 
+    //get texture
+    pixel_data newTexture;
 
+    //load the single texture for every planet
+    int textureId;//initialize here to use it later, pass it to the texture parameters
+    for(textureId = 0; textureId < NUMBER_OF_CEL_BODIES; textureId++){
+
+        loadSingleTexture(arrayOfPlanets[textureId].name, textureId);
+
+    }
+
+    loadSkyboxTexture(textureId);
+
+}
+
+//ASSIGNMENT 4 - Load a single texture for each planet, based on name and index from the planetTextures
+void ApplicationSolar::loadSingleTexture(string name, GLuint id){
+
+    //load texture from file for this planet
+    pixel_data newTexture = texture_loader::file(m_resource_path + "textures/" + name + ".png");//converted to .png for better render
+
+    //set ID
+    planetTextures[id] = id;
+
+    //switch active texture
+    if(name == "stars"){
+        glActiveTexture((GLenum) (GL_TEXTURE10));
+    }else{
+        glActiveTexture((GLenum) (GL_TEXTURE0 + id));
+    }
+    //generate texture object
+    glGenTextures(1, &planetTextures[id]);
+    //bind texture to 2D texture binding point of active unit
+    glBindTexture(GL_TEXTURE_2D, planetTextures[id]);
+
+    //define sampling parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //define texture data and texture format
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)newTexture.width, (GLsizei)newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
+}
+
+//ASSIGNMENT 4 - Load skybox texture
+void ApplicationSolar::loadSkyboxTexture(GLuint id) {
+    //We re-use the loadSingleTexture here, but to enable/disable the skybox, we made this function separate
+    //the only thing that changes is the name of the texture
+    //it's not a planet, but it's all the stars
+    loadSingleTexture("stars", id + 1);
+}
+
+//ASSIGNMENT 4 - Loads the normal map for selected planet
+void ApplicationSolar::loadNormalMap(GLenum targetTextureUnit){
+
+    //load texture from file for this planet
+    pixel_data newTexture = texture_loader::file(m_resource_path + "textures/earthnormal.png");
+
+    GLuint textureIndex = 11;
+
+    //set ID
+    planetTextures[textureIndex] = textureIndex;
+
+    //switch active texture
+    glActiveTexture(targetTextureUnit);
+    //generate texture object
+    glGenTextures(1, &planetTextures[textureIndex]);
+    //bind texture to 2D texture binding point of active unit
+    glBindTexture(GL_TEXTURE_2D, planetTextures[textureIndex]);
+
+    //define sampling parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //define texture data and texture format
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)newTexture.width, (GLsizei)newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
 }
 
 void ApplicationSolar::render() const {
@@ -96,36 +181,41 @@ void ApplicationSolar::render() const {
   //ASSIGNMENT 1
   //RENDER! via a loop
     for (int i = 0; i < NUMBER_OF_CEL_BODIES; i++) {
-        renderPlanets(ApplicationSolar::arrayOfPlanets[i]);
+        if(arrayOfPlanets[i].type != "moon") {
+            renderPlanets(arrayOfPlanets[i], i);
+        }
     }
 
-    //ASSIGNMENT 2
-    renderStars();
-//    renderOrbits();
+    //ASSIGNMENT 4 - render Skybox
+    renderSkybox();
+    //ASSIGNMENT 2 - render stars and orbits
+//    renderStars(); //comment so we can see the skybox
+    renderOrbits();
 
 }
 
 
 //ASSIGNMENT 1 - RENDER PLANETS
-void ApplicationSolar::renderPlanets(Planet thePlanet) const{
+void ApplicationSolar::renderPlanets(Planet thePlanet, int planetId) const{
     //1st is the already created matrix obj
     //2nd parameter rotation values (deg)
     //3rd parameter is the rotation axis
-    glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * thePlanet.rotation), glm::fvec3{ 0.0f, 1.0f, 0.0f });
+    glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * thePlanet.rotation)/10, glm::fvec3{ thePlanet.orbitTilt, 1.0f, 0.0f });
 
-    //    VERY IMPORTANT!!!! THE ORDER OF SCALING/ROTATION/TRANSFORMATION WILL AFFECT THE FINAL RESULT AND RENDER!!!!!
+    //VERY IMPORTANT!!!! THE ORDER OF SCALING/ROTATION/TRANSFORMATION WILL AFFECT THE FINAL RESULT AND RENDER!!!!!
     //translate first
     //translate the sphere according to the vector we have in the 2nd param
     model_matrix = glm::translate(model_matrix, glm::fvec3{ 0.0, 0.0, thePlanet.distance});
 
 
     //is this planet earth? Then render the moon around it!
-    if (thePlanet.type == "moon") {
+    if (thePlanet.name == "earth") {
         //Earth's moon
-        Planet earthmoon = thePlanet;
+        int moonId = planetId + 1;
+        Planet earthmoon = arrayOfPlanets[moonId];
 
         //rotation
-        glm::fmat4 model_matrix_moon = glm::rotate(model_matrix, float(glfwGetTime() * earthmoon.rotation), glm::fvec3{ 1.0f, 0.0f, 0.0f });
+        glm::fmat4 model_matrix_moon = glm::rotate(model_matrix, float(glfwGetTime() * glm::pi<float>() / 10.0), glm::fvec3{ 1.0f, 0.0f, 0.0f });
 
         //translation
         model_matrix_moon = glm::translate(model_matrix_moon, glm::fvec3{ 0.0f, 0.0f, earthmoon.distance });
@@ -141,8 +231,12 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const{
                            1, GL_FALSE, glm::value_ptr(normal_matrix_moon));
 
         //ASSIGNMENT 3 - Color for the moon
-        glm::vec3 earthmoonColor = earthmoon.color;
-        glUniform3fv(m_shaders.at("planet").u_locs.at("DiffuseColor"), 1, glm::value_ptr(earthmoonColor));
+//        glm::vec3 earthmoonColor = earthmoon.color;
+//        glUniform3fv(m_shaders.at("planet").u_locs.at("DiffuseColor"), 1, glm::value_ptr(earthmoonColor));
+
+        //ASSIGNMENT 4 - Add the textures to the planets here
+        glActiveTexture((GLenum)(GL_TEXTURE0 + moonId));
+        glUniform1i(m_shaders.at("planet").u_locs.at("textureColor"), moonId);
 
         // bind the VAO to draw
         glBindVertexArray(planet_object.vertex_AO);
@@ -165,16 +259,16 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const{
 
     //ASSIGNMENT 3 - Render colors here!
     //GEt the color from the struct:
-    glm::vec3 planetColour = {thePlanet.color[0]/255, thePlanet.color[1]/255, thePlanet.color[2]/255};
+    glm::vec3 planetColor = {thePlanet.color[0]/255, thePlanet.color[1]/255, thePlanet.color[2]/255};
     //Pass it to the shader
-    glUniform3fv(m_shaders.at("planet").u_locs.at("DiffuseColor"), 1, glm::value_ptr(planetColour));
+    glUniform3fv(m_shaders.at("planet").u_locs.at("DiffuseColor"), 1, glm::value_ptr(planetColor));
 
     //ASSIGNMENT 3 - Light source: the sun
     //Be brighty bright Sun! This will be the source for the light of the entire system
     glm::fmat4 view_matrix = glm::inverse(m_view_transform);
     glm::vec4 origin;
     if (thePlanet.name == "sun" ) {
-        origin = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);//initialize origin of light for the sun
+        origin = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);//initialize origin of light for the sun
     }else {
         origin = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);//initialize origin of light for the planets
 
@@ -183,8 +277,23 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const{
     glm::vec3 sunPos(view_matrix * origin);
     glUniform3fv(m_shaders.at("planet").u_locs.at("sunPosition"), 1, glm::value_ptr(sunPos));
 
+    //ASSIGNMENT 4 - Add the textures to the planets here
+    glActiveTexture(GL_TEXTURE0 + planetId);
+    glUniform1i(m_shaders.at("planet").u_locs.at("textureColor"), planetId);
+
+    //normal map
+    glUniform1i(m_shaders.at("planet").u_locs.at("normalMapId"), (int)planetTextures[11]);
+
+    if (thePlanet.name == "earth") {
+        glUniform1b(m_shaders.at("planet").u_locs.at("hasBumpMap"), true);
+    }
+    else {
+        glUniform1b(m_shaders.at("planet").u_locs.at("hasBumpMap"), false);
+    }
+
     // bind the VAO to draw
     glBindVertexArray(planet_object.vertex_AO);
+
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
 
@@ -193,13 +302,14 @@ void ApplicationSolar::renderPlanets(Planet thePlanet) const{
 //ASSIGNMENT 2 - Make the orbit for each planet!
 void ApplicationSolar::makeOrbits() {
 
-    //If it's not the sun, render the orbit
-    for (int i = 1; i < NUMBER_OF_CEL_BODIES; i++) {
-        Planet aPlanet = ApplicationSolar::arrayOfPlanets[i];
+    //Render the orbit
+    for (int i = 0; i < NUMBER_OF_CEL_BODIES; i++) {
+        Planet aPlanet = arrayOfPlanets[i];
 		////create orbit with diameter 1 and scale before rendering
         int orbit = ORBIT_THICKNESS;
         float counter = 2.0 * glm::pi<float>() / (float)orbit;
         float dist = aPlanet.distance;
+        float skew = aPlanet.orbitTilt;
 		
 		////try a while loop
 
@@ -207,9 +317,8 @@ void ApplicationSolar::makeOrbits() {
             //x
             orbitBuffer.push_back(dist * cosf(orb));
 
-			////only x and z needed
             //y
-            orbitBuffer.push_back(dist * -0.3 * cosf(orb));
+            orbitBuffer.push_back(dist * -skew * cosf(orb));
             //z
             orbitBuffer.push_back(dist * sinf(orb));
         }
@@ -223,43 +332,32 @@ void ApplicationSolar::renderOrbits() const{
     glUseProgram(m_shaders.at("orbit").handle);
     glBindVertexArray(orbit_object.vertex_AO);
 
-    //render every orbit
-    for (int i = 1; i < NUMBER_OF_CEL_BODIES; i++) {
-        Planet aPlanet = arrayOfPlanets[i];
+    for(int i = 0; i < NUMBER_OF_CEL_BODIES; i++){
+        //don't move shader model matrix - orbit is a static loop
+        glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
+                           1, GL_FALSE, glm::value_ptr(glm::fmat4{}));
 
-        //render the orbits for the planets first
-        if (aPlanet.type != "moon") {
 
-            //don't move shader model matrix - orbit is a static loop
+        //draw orbit
+        glDrawArrays(orbit_object.draw_mode, i * orbit_object.num_elements, orbit_object.num_elements);
+
+        //If the current planet is earth, attach the orbit of the moon to it
+        if(arrayOfPlanets[i].name == "earth"){
+
+            Planet earth = arrayOfPlanets[i];
+            float earthmoon = earth.size * 0.542;
+
+            //create rotated and translated matrix with planet information
+            glm::fmat4 m_earth;
+
+            m_earth = glm::rotate(glm::fmat4{}, float(glfwGetTime() * earth.rotation)/10, glm::fvec3{ 0.0f, 1.0f, 0.0f });
+            m_earth = glm::translate(m_earth, glm::fvec3{ 0.0f, 0.0f, earth.distance});
+            m_earth = glm::rotate(m_earth, float (M_PI / 1.8f), glm::fvec3{ 0.0f, 0.0f, 1.0f });
+            m_earth = glm::scale(m_earth, glm::fvec3{ earthmoon, earthmoon, earthmoon });
             glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
-                               1, GL_FALSE, glm::value_ptr(glm::fmat4{}));
-
-
-            //draw orbit
-            glDrawArrays(orbit_object.draw_mode, i * orbit_object.num_elements, orbit_object.num_elements);
-
-            //if this planet has a moon
-			////If it is not the moon use the parent matrixmodel matrix and render it
-
-            if (arrayOfPlanets[i].name == "earth") {
-
-                Planet earth = arrayOfPlanets[i];
-
-                //create rotated and translated matrix with planet information
-                glm::fmat4 m_earth = glm::rotate(glm::fmat4{}, float(glfwGetTime() * earth.rotation), glm::fvec3{ 0.0f, 1.0f, 0.0f });
-                m_earth = glm::translate(m_earth, glm::fvec3{ 0.0f, 0.0f, earth.rotation });
-                m_earth = glm::rotate(m_earth, glm::pi<float>() / 2.f, glm::fvec3{ 0.0f, 0.0f, 1.0f });
-
-                //update shader model matrix
-                glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
-                                   1, GL_FALSE, glm::value_ptr(m_earth));
-
-                //draw orbit
-				////why are we using different metric?
-
-                glDrawArrays(orbit_object.draw_mode, i * 100, orbit_object.num_elements);
-
-            }
+                               1, GL_FALSE, glm::value_ptr(m_earth));
+            //draw orbit of the moon (moon's index = i + 1, times the space (10) between the moon and earth)
+            glDrawArrays(orbit_object.draw_mode, 50, orbit_object.num_elements);
         }
     }
 }
@@ -273,6 +371,43 @@ void ApplicationSolar::renderStars() const{
     glBindVertexArray(star_object.vertex_AO);
     //draw all
     glDrawArrays(GL_POINTS, 0, star_object.num_elements);
+
+}
+
+//ASSIGNMENT 4 - Render skybox
+void ApplicationSolar::renderSkybox() const{
+
+    glUseProgram(m_shaders.at("planet").handle);
+
+    // use rotation speed and planet skew to create planet's orbit
+    glm::fmat4 model_matrix;
+
+    // scale skybox so it will be bigger than the solar system here
+    float skyboxSize = 70.0f;
+    model_matrix = glm::scale(model_matrix, glm::fvec3{skyboxSize, skyboxSize, skyboxSize});
+
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                       1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    //extra matrix for normal transformation to keep them orthogonal to surface
+    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                       1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+
+    //textureIndex is last member of planetTextures list, for the skybox
+    GLuint textureIndex = NUMBER_OF_CEL_BODIES;
+
+    //Give the star texture to this skybox
+    glActiveTexture(GL_TEXTURE11);
+    glUniform1i(m_shaders.at("planet").u_locs.at("textureColor"), textureIndex);
+
+    // bind the VAO to draw
+    glBindVertexArray(planet_object.vertex_AO);
+
+    // draw bound vertex array using bound shader
+    glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+
 
 }
 
@@ -420,6 +555,10 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["sunPosition"] = -1;
     m_shaders.at("planet").u_locs["DiffuseColor"] = -1;
     m_shaders.at("planet").u_locs["ShaderMode"] = -1;
+    //ASSIGNMENT 4 - Textures
+    m_shaders.at("planet").u_locs["textureColor"] = -1;
+    m_shaders.at("planet").u_locs["normalMapId"] = -1;
+    m_shaders.at("planet").u_locs["hasBumpMap"] = -1;
 
 
     // add star shader here
@@ -440,6 +579,10 @@ void ApplicationSolar::initializeShaderPrograms() {
 
 // load models
 void ApplicationSolar::initializeGeometry() {
+
+    //=================================================================
+    // planet initialisation
+
     model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
 
     // generate vertex array object
@@ -464,6 +607,15 @@ void ApplicationSolar::initializeGeometry() {
     // second attribute is 3 floats with no offset & stride
     glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
 
+    // activate third attribute on gpu - texture coordinates
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TEXCOORD]);
+
+    // activate fourth attribute on gpu - tangents
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, model::TANGENT.components, model::TANGENT.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TANGENT]);
+
+
 
     // generate generic buffer
     glGenBuffers(1, &planet_object.element_BO);
@@ -478,7 +630,10 @@ void ApplicationSolar::initializeGeometry() {
     planet_object.num_elements = GLsizei(planet_model.indices.size());
 
 
-    //ASSIGNMENT 2 - Stars
+    //======================================================================
+    // star initialisation - lecture 4 slide 8
+
+
     //generate vertex array object
     glGenVertexArrays(1, &star_object.vertex_AO);
     // bind the array for attaching buffers
@@ -500,14 +655,19 @@ void ApplicationSolar::initializeGeometry() {
     //reinstate
     glVertexAttribPointer(0, star_model.POSITION.components, star_model.POSITION.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::POSITION]);
 
+
     // activate second attribute on gpu - colour
     glEnableVertexAttribArray(1);
     // second attribute is 3 floats with offset & stride of 3 floats
+
     glVertexAttribPointer(1, star_model.NORMAL.components, star_model.NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::NORMAL]);
 
 
+    // end star initialisation
+    //======================================================================
+    //orbit initialisation
 
-    //ASSIGNMENT 2 - Orbits
+
     // generate vertex array object
     glGenVertexArrays(1, &orbit_object.vertex_AO);
     // bind the array for attaching buffers
@@ -528,7 +688,6 @@ void ApplicationSolar::initializeGeometry() {
 
     // store type of primitive to draw
     orbit_object.draw_mode = GL_LINE_LOOP;
-
 
 }
 

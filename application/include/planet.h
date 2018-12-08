@@ -11,6 +11,7 @@ struct Planet {
     float size; //size
     float distance; //distance
     float rotation; //rotation
+    float orbitTilt;//orbit tilt
     string type;//sun, planet or star
     glm::vec3 color; //literally the color we need for each planet!
 };
