@@ -43,6 +43,8 @@ class ApplicationSolar : public Application {
   void renderStars() const;
   void renderOrbits() const;
   void renderSkybox() const;
+  //ASSIGNMENT 5 - Render quad
+  void renderQuad() const;
 
 private:
     //ASSIGNMENT 2 - Make the orbits
@@ -54,6 +56,8 @@ private:
     void loadSingleTexture(std::string name, GLuint id);
     void loadSkyboxTexture( GLuint id);
     void loadNormalMap(GLenum targetTextureUnit);
+    //ASSIGNMENT 5 - offscreen rendering
+    void setupOffscreenRendering();
 
 
     //ASSIGNMENT 2 - stars and orbit buffer
@@ -61,9 +65,16 @@ private:
     std::vector< float > orbitBuffer;
     //ASSIGNMENT 4 - add Skybox buffer
     std::vector< float > skyBoxBuffer;
+    //ASSIGNMENT 5 - Screenquad arrays
+    std::vector< float >  screenQuad = {-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, -1.0, 1.0, 0.0, 1.0, 1.0, 0.0};
 
     //ASSIGNMENT 4 - Array for the textures
     GLuint planetTextures[NUMBER_OF_CEL_BODIES + 2];
+    //ASSIGNMENT 5 - new handles for FBO and textures
+    GLuint rbHandle;
+    GLuint drawBufferTexture;
+    GLuint fboHandle;
+    int Post_Processing_Flag = 0;
 
     // cpu representation of model
     model_object planet_object;
@@ -71,6 +82,8 @@ private:
     model_object star_object;
     model_object orbit_object;
     model_object skybox_object;
+    //ASSIGNMENT 5 - screenquad object
+    model_object screenquad_object;
 
     //ASSIGNMENT 1 - MOVED HERE TO MAKE IT GLOBAL!!!
     Planet arrayOfPlanets[NUMBER_OF_CEL_BODIES] ={

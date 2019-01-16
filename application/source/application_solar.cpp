@@ -38,10 +38,12 @@ model planet_model{};
 model star_model{};
 model orbit_model{};
 model skybox_model{};
+//ASSIGNMENT 5
+model screenquad_model{};
 
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
- , planet_object{}, star_object{}, orbit_object{}, skybox_object{}
+ , planet_object{}, star_object{}, orbit_object{}, skybox_object{}, screenquad_object{}
 {
 
     //ASSIGNMENT 2 - BUFFER FOR STARS
@@ -69,6 +71,8 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
     //load normal map
     loadNormalMap(GL_TEXTURE12);
 
+    //ASSIGNMENT 5 - Initialize frame buffer
+    setupOffscreenRendering();
 
     //MODELS GO HERE
     //planet
@@ -79,6 +83,8 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
     orbit_model = {orbitBuffer, model::POSITION};
     //Skybox model
     skybox_model = {skyBoxBuffer, model::POSITION};
+    //ASSIGNMENT 5
+    screenquad_model = {screenQuad, model::POSITION};
 
     //set starting view
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{ 0.0f, 0.0f, 10.0f });
@@ -104,7 +110,8 @@ void ApplicationSolar::loadAllTextures(){
 
     }
 
-    loadSkyboxTexture(textureId);
+//    loadSkyboxTexture(textureId);
+    loadSingleTexture("nebula1", textureId);
 
 }
 
@@ -118,11 +125,12 @@ void ApplicationSolar::loadSingleTexture(string name, GLuint id){
     planetTextures[id] = id;
 
     //switch active texture
-    if(name == "stars"){
-        glActiveTexture((GLenum) (GL_TEXTURE10));
-    }else{
-        glActiveTexture((GLenum) (GL_TEXTURE0 + id));
-    }
+//    if(name == "stars"){
+//        glActiveTexture((GLenum) (GL_TEXTURE10));
+//    }else{
+//        glActiveTexture((GLenum) (GL_TEXTURE0 + id));
+//    }
+    glActiveTexture((GLenum) (GL_TEXTURE0 + id));
     //generate texture object
     glGenTextures(1, &planetTextures[id]);
     //bind texture to 2D texture binding point of active unit
@@ -133,7 +141,11 @@ void ApplicationSolar::loadSingleTexture(string name, GLuint id){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     //define texture data and texture format
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)newTexture.width, (GLsizei)newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
+
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)newTexture.width, (GLsizei)newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newTexture.width, newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
+
 }
 
 //ASSIGNMENT 4 - Load skybox texture
@@ -167,10 +179,66 @@ void ApplicationSolar::loadNormalMap(GLenum targetTextureUnit){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     //define texture data and texture format
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)newTexture.width, (GLsizei)newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newTexture.width, newTexture.height, 0, newTexture.channels, newTexture.channel_type, newTexture.ptr());
+}
+
+//ASSIGNMENT 5
+void ApplicationSolar::setupOffscreenRendering(){
+
+
+    //get screen size
+    GLint viewportData[4];
+    glGetIntegerv(GL_VIEWPORT, viewportData);
+
+
+    //create texture
+    //switch active texture
+    glActiveTexture(GL_TEXTURE13);
+    //generate texture object
+    glGenTextures(1, &drawBufferTexture);
+    //bind texture to 2D texture binding point of active unit
+    glBindTexture(GL_TEXTURE_2D, drawBufferTexture);
+    //add empty texture image
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewportData[2], viewportData[3], 0,
+                 GL_RGB, GL_FLOAT, 0);
+
+    //define sampling parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+    //create render buffer (for depth buffer)
+    glGenRenderbuffers(1, &rbHandle);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbHandle);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, viewportData[2], viewportData[3]);
+
+
+    //setup FBO
+    glGenFramebuffers(1, &fboHandle);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+    //define attachments
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, drawBufferTexture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER, rbHandle);
+
+    //create draw buffers
+    GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, draw_buffers);
+
+    //check validity
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE){
+        throw std::logic_error("framebuffer error");
+    }
+
+
 }
 
 void ApplicationSolar::render() const {
+
+    //ASSIGNMENT 5
+    //set to render to texture (via FBO)
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // bind shader to upload uniforms
     glUseProgram(m_shaders.at("planet").handle);
@@ -191,6 +259,11 @@ void ApplicationSolar::render() const {
     //ASSIGNMENT 2 - render stars and orbits
 //    renderStars(); //comment so we can see the skybox
     renderOrbits();
+    //ASSIGNMENT 5 - screen quad
+    //set to render to texture (via FBO)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    renderQuad();
 
 }
 
@@ -396,10 +469,10 @@ void ApplicationSolar::renderSkybox() const{
 
 
     //textureIndex is last member of planetTextures list, for the skybox
-    GLuint textureIndex = NUMBER_OF_CEL_BODIES;
+    GLuint textureIndex = 10;
 
     //Give the star texture to this skybox
-    glActiveTexture(GL_TEXTURE11);
+//    glActiveTexture(textureIndex);
     glUniform1i(m_shaders.at("planet").u_locs.at("textureColor"), textureIndex);
 
     // bind the VAO to draw
@@ -408,6 +481,18 @@ void ApplicationSolar::renderSkybox() const{
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
 
+
+}
+
+//ASSIGNMENT 5 - render screenquad
+void ApplicationSolar::renderQuad() const{
+
+    glUseProgram(m_shaders.at("quad").handle);
+    glUniform1i(m_shaders.at("quad").u_locs.at("TexID"), drawBufferTexture);
+    glUniform1i(m_shaders.at("quad").u_locs.at("PP_FLAG"), Post_Processing_Flag);
+
+    glBindVertexArray(screenquad_object.vertex_AO);
+    glDrawArrays(screenquad_object.draw_mode, 0, screenquad_object.num_elements);
 
 }
 
@@ -455,6 +540,16 @@ void ApplicationSolar::updateProjection() {
     glUseProgram(m_shaders.at("orbit").handle);
     glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ProjectionMatrix"),
                        1, GL_FALSE, glm::value_ptr(m_view_projection));
+
+
+    //update render buffer size
+    glBindRenderbuffer(GL_RENDERBUFFER, rbHandle);
+    //get screen size
+    GLint viewportData[4];
+    glGetIntegerv(GL_VIEWPORT, viewportData);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, viewportData[2], viewportData[3]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewportData[2], viewportData[3], 0,
+                 GL_RGB, GL_FLOAT, 0);
 }
 
 // update uniform locations
@@ -503,7 +598,23 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
     else if (key == GLFW_KEY_2 && action != GLFW_PRESS) {
         glUseProgram(m_shaders.at("planet").handle);
         glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), 2);
+    }
 
+    //ASSIGNMENT 5
+    //map flags on keys, taken from here:
+    //https://www.experts-exchange.com/articles/1842/Binary-Bit-Flags-Tutorial-and-Usage-Tips.html
+
+    else if (key == GLFW_KEY_7 && action != GLFW_PRESS){
+        Post_Processing_Flag ^= 1UL << 0;//greyscale
+    }
+    else if (key == GLFW_KEY_8 && action != GLFW_PRESS){
+        Post_Processing_Flag ^= 1UL << 1;//horizontal flip
+    }
+    else if (key == GLFW_KEY_9 && action != GLFW_PRESS){
+        Post_Processing_Flag ^= 1UL << 2;//vertical flip
+    }
+    else if (key == GLFW_KEY_0 && action != GLFW_PRESS){
+        Post_Processing_Flag ^= 1UL << 3;//blur
     }
 
 }
@@ -575,6 +686,15 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("orbit").u_locs["ModelMatrix"] = -1;
     m_shaders.at("orbit").u_locs["ViewMatrix"] = -1;
     m_shaders.at("orbit").u_locs["ProjectionMatrix"] = -1;
+
+    //ASSIGNMENT 5
+    m_shaders.emplace("quad", shader_program{m_resource_path + "shaders/quad.vert",
+                                             m_resource_path + "shaders/quad.frag"});
+    m_shaders.at("quad").u_locs["Texture"] = -1;
+    m_shaders.at("quad").u_locs["TexID"] = -1;
+    m_shaders.at("quad").u_locs["PP_FLAG"] = -1;
+    //test
+//    m_shaders.at("quad").u_locs["Color"] = -1;
 }
 
 // load models
@@ -689,6 +809,30 @@ void ApplicationSolar::initializeGeometry() {
     // store type of primitive to draw
     orbit_object.draw_mode = GL_LINE_LOOP;
 
+    //ASSIGNMENT 5
+
+    // generate vertex array object
+    glGenVertexArrays(1, &screenquad_object.vertex_AO);
+    // bind the array for attaching buffers
+    glBindVertexArray(screenquad_object.vertex_AO);
+
+    // generate generic buffer
+    glGenBuffers(1, &screenquad_object.vertex_BO);
+    // bind this as an vertex array buffer containing all attributes
+    glBindBuffer(GL_ARRAY_BUFFER, screenquad_object.vertex_BO);
+    // configure currently bound array buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * screenquad_model.data.size(), screenquad_model.data.data(), GL_STATIC_DRAW);
+
+    // activate first attribute on gpu
+    glEnableVertexAttribArray(0);
+    // first attribute is 3 floats with no offset & stride
+    glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, screenquad_model.vertex_bytes, screenquad_model.offsets[model::POSITION]);
+
+
+    // transfer number of indices to model object
+    screenquad_object.num_elements = GLsizei(screenquad_model.data.size());
+    screenquad_object.draw_mode = GL_TRIANGLE_STRIP;
+
 }
 
 //returns a position float, up to specified max value
@@ -730,6 +874,15 @@ ApplicationSolar::~ApplicationSolar() {
   //delete orbits
   glDeleteBuffers(1, &orbit_object.vertex_BO);
   glDeleteVertexArrays(1, &orbit_object.vertex_AO);
+
+  //ASSIGNMENT 5
+  //delete quad buffers
+  glDeleteBuffers(1, &screenquad_object.vertex_BO);
+  glDeleteVertexArrays(1, &screenquad_object.vertex_AO);
+  //delete render buffer
+  glDeleteRenderbuffers(1, &rbHandle);
+  //delete framebuffer
+  glDeleteFramebuffers(1, &fboHandle);
 }
 
 // exe entry point

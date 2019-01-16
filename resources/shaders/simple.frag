@@ -33,7 +33,8 @@ void main() {
 
     //ASSIGNMENT 4 - TEXTURES
     //adjust co-ordinates to better fit over planets
-    vec2 newCoord = vec2((pass_textureCoord.x * 0.5) + 0.5, (pass_textureCoord.y * 0.5) + 0.5);
+    vec2 newCoord = vec2(((pass_textureCoord.y + 1.0) * 0.5), ( (pass_textureCoord.x + 1.0) * 0.25));
+
     //Get the original color as the texture on the new coordinate
     vec3 originalColor = vec3(texture(textureColor, newCoord));
 
